@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = "garmentpro_secret_key_123"
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'model', 'demand_model.pkl')
 STORE_DB_PATH = os.path.join(os.path.dirname(__file__), "store.db")
-model = None
+model = model = joblib.load(MODEL_PATH)
 
 def load_model():
     global model
@@ -1909,5 +1909,9 @@ def predict():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 
-if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+# if __name__ == '__main__':
+#     app.run(debug=True, port=8000)
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
