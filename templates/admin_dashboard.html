@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1>Admin Control Panel</h1>
+    <p>Manage production, orders and analytics</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+
+<div class="container">
+
+<div class="row g-4">
+
+<div class="col-md-3">
+<a href="/dashboard" style="text-decoration:none">
+<div class="stat-card">
+<div class="stat-icon" style="background:#c9a84c20">
+<i class="bi bi-bar-chart"></i>
+</div>
+<div>
+<div class="stat-num">Analytics</div>
+<div class="stat-lbl">Production Metrics</div>
+</div>
+</div>
+</a>
+</div>
+
+<div class="col-md-3">
+<a href="/orders" style="text-decoration:none">
+<div class="stat-card">
+<div class="stat-icon" style="background:#2d9e6b20">
+<i class="bi bi-box"></i>
+</div>
+<div>
+<div class="stat-num">Orders</div>
+<div class="stat-lbl">Manage Orders</div>
+</div>
+</div>
+</a>
+</div>
+
+<div class="col-md-3">
+<a href="/production" style="text-decoration:none">
+<div class="stat-card">
+<div class="stat-icon" style="background:#2980b920">
+<i class="bi bi-gear"></i>
+</div>
+<div>
+<div class="stat-num">Production</div>
+<div class="stat-lbl">Factory Status</div>
+</div>
+</div>
+</a>
+</div>
+
+<div class="col-md-3">
+<a href="/forecast" style="text-decoration:none">
+<div class="stat-card">
+<div class="stat-icon" style="background:#e67e2220">
+<i class="bi bi-graph-up"></i>
+</div>
+<div>
+<div class="stat-num">Forecast</div>
+<div class="stat-lbl">Demand Prediction</div>
+</div>
+</div>
+</a>
+</div>
+
+<div class="col-md-3">
+<a href="/fabric-inventory" style="text-decoration:none">
+<div class="stat-card">
+<div class="stat-icon" style="background:#6f42c120">
+<i class="bi bi-box-seam"></i>
+</div>
+<div>
+<div class="stat-num">Fabric</div>
+<div class="stat-lbl">Inventory</div>
+</div>
+</div>
+</a>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+{% endblock %}

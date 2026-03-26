@@ -1,0 +1,25 @@
+<h2>Edit Order</h2>
+
+<form method="POST">
+
+Brand
+<input type="text" name="brand" value="{{ order.brand }}">
+
+Product
+<input type="text" name="product" value="{{ order.product }}">
+
+Quantity
+<input type="number" name="quantity" value="{{ order.quantity }}">
+
+Fabric Received
+<input type="number" name="fabric_received" value="{{ order.fabric_received }}">
+
+Status
+<input type="text" name="status" value="{{ order.status }}">
+
+Due Date
+<input type="date" name="due_date" value="{{ order.due_date }}">
+
+<button type="submit">Update Order</button>
+
+</form>

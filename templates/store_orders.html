@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}My Store Orders - GarmentPro{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item active">My Orders</li></ol></nav>
+    <h1>My Orders</h1>
+    <p>Track your placed product orders</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+  <div class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-success mb-4">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="row g-4">
+      {% for order in orders %}
+      <div class="col-lg-4 col-md-6">
+        <div class="info-card h-100">
+          <img src="{{ order.image_url }}" alt="{{ order.product_name }}" class="product-thumb mb-3">
+          <h5>{{ order.product_name }}</h5>
+          <p class="mb-1"><strong>Category:</strong> {{ order.category }}</p>
+          <p class="mb-1"><strong>Price:</strong> INR {{ order.price }}</p>
+          <p class="mb-1"><strong>Size:</strong> {{ order.size }}</p>
+          <p class="mb-1"><strong>Quantity:</strong> {{ order.quantity }}</p>
+          <p class="mb-1"><strong>Order ID:</strong> {{ order.order_id }}</p>
+          <p class="mb-0"><strong>Status:</strong> {{ order.status }}</p>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12">
+        <div class="chart-card text-center">
+          <h5 style="color:var(--navy)">No orders yet</h5>
+          <p style="color:var(--text-mid)">Browse products and place your first order.</p>
+          <a href="/store/products" class="btn btn-gold btn-sm">Go to Products</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Login – GarmentPro{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1>User Login</h1>
+    <p>Access your GarmentPro account</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+
+<div class="container">
+
+<div class="row justify-content-center">
+
+<div class="col-lg-5">
+
+<div class="forecast-container">
+
+<h4 style="color:var(--navy);margin-bottom:20px">
+<i class="bi bi-box-arrow-in-right me-2"></i>Login
+</h4>
+
+<form method="POST">
+<input type="hidden" name="next" value="{{ next_url or '' }}">
+
+<div class="mb-3">
+<label class="form-label">Username</label>
+<input type="text" name="username" class="form-control" required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Password</label>
+<input type="password" name="password" class="form-control" required>
+</div>
+
+<div class="mb-3">
+<button class="btn btn-gold w-100">Login</button>
+</div>
+
+</form>
+
+<p style="font-size:0.9rem;color:var(--text-mid)">
+Don't have an account?
+<a href="/register" style="color:var(--gold)">Register here</a>
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+{% endblock %}

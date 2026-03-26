@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block title %}GarmentPro – Smart Garment Production Management{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="container position-relative">
+    <div class="row align-items-center" style="min-height:88vh">
+      <div class="col-lg-6 py-5">
+        <!-- <div class="hero-badge fade-in"><i class="bi bi-cpu me-2"></i>AI-Powered Manufacturing Intelligence</div> -->
+        <h1 class="hero-title fade-in" style="animation-delay:0.1s">
+          Smart Garment
+          <span class="accent">Production & Demand</span>
+          Forecasting System
+        </h1>
+        <p class="hero-sub fade-in" style="animation-delay:0.2s">
+          Empowering garment job-work manufacturing units with real-time production tracking, 
+          demand forecasting, and end-to-end order management — built for the Indian textile industry.
+        </p>
+        <!-- <div class="d-flex flex-wrap gap-3 fade-in" style="animation-delay:0.3s">
+          <a href="/forecast" class="btn btn-gold"><i class="bi bi-graph-up-arrow me-2"></i>Predict Demand</a>
+          <a href="/dashboard" class="btn btn-outline-gold"><i class="bi bi-grid me-2"></i>View Dashboard</a>
+        </div> -->
+        <!-- <div class="hero-stats fade-in" style="animation-delay:0.4s">
+          <div class="hero-stat"><div class="num">25K+</div><div class="lbl">Monthly Output</div></div>
+          <div class="hero-stat"><div class="num">94%</div><div class="lbl">Forecast Accuracy</div></div>
+          <div class="hero-stat"><div class="num">8</div><div class="lbl">Product Lines</div></div>
+          <div class="hero-stat"><div class="num">40+</div><div class="lbl">Brand Partners</div></div>
+        </div> -->
+      </div>
+      <div class="col-lg-6 d-none d-lg-block py-5">
+        <div class="hero-graphic fade-in" style="animation-delay:0.3s">
+          <div class="hero-card">
+            <div class="hero-card-title"><i class="bi bi-activity me-2"></i>Live Production Dashboard</div>
+            <div class="metric-row"><span class="metric-label">Today's Output</span><span class="metric-value">{{ live_metrics.completed_today }} / {{ live_metrics.daily_target }} units</span></div>
+            <div class="metric-row"><span class="metric-label">Active Machines</span><span class="metric-value">{{ live_metrics.machines_active }} / {{ live_metrics.total_machines }}</span></div>
+            <div class="metric-row"><span class="metric-label">Pending Orders</span><span class="metric-value">{{ live_metrics.pending_orders }} orders</span></div>
+            <div class="metric-row"><span class="metric-label">Forecasted Demand</span><span class="metric-value text-warning">{{ "{:,}".format(live_metrics.forecasted_demand) }} units</span></div>
+            <div class="metric-row"><span class="metric-label">Fabric Stock</span><span class="metric-value">{{ "{:,}".format(live_metrics.fabric_stock) }} meters</span></div>
+            <div class="metric-row"><span class="metric-label">Efficiency Rate</span><span class="metric-value" style="color:#3dcb8a">{{ live_metrics.efficiency_rate }}%</span></div>
+          </div>
+          <!-- <div class="row g-3 mt-3">
+            <div class="col-4">
+              <div style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:16px;text-align:center;">
+                <div style="font-size:1.6rem">👔</div>
+                <div style="color:var(--gold-light);font-size:0.75rem;margin-top:6px">Shirts</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:16px;text-align:center;">
+                <div style="font-size:1.6rem">🧸</div>
+                <div style="color:var(--gold-light);font-size:0.75rem;margin-top:6px">Kidswear</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:16px;text-align:center;">
+                <div style="font-size:1.6rem">🧥</div>
+                <div style="color:var(--gold-light);font-size:0.75rem;margin-top:6px">Innerwear</div>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS STRIP -->
+<div style="background:var(--gold);padding:16px 0">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-center gap-4 text-center">
+      <span style="color:var(--navy);font-weight:600;font-size:0.85rem"><i class="bi bi-box-seam me-2"></i>Brand Sends Fabric</span>
+      <span style="color:var(--navy)">→</span>
+      <span style="color:var(--navy);font-weight:600;font-size:0.85rem"><i class="bi bi-scissors me-2"></i>Unit Stitches Garments</span>
+      <span style="color:var(--navy)">→</span>
+      <span style="color:var(--navy);font-weight:600;font-size:0.85rem"><i class="bi bi-truck me-2"></i>Finished Goods Returned</span>
+      <span style="color:var(--navy)">→</span>
+      <span style="color:var(--navy);font-weight:600;font-size:0.85rem"><i class="bi bi-graph-up me-2"></i>AI Forecasts Next Demand</span>
+    </div>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Featured Collection</span>
+      <h2 class="section-title">Featured <span>Products</span></h2>
+      <p class="section-desc">Explore top-selling garments and view details before placing your order.</p>
+      <div class="divider-gold"></div>
+    </div>
+    <div class="row g-4">
+      {% for product in featured_products %}
+      <div class="col-lg-3 col-md-6">
+        <div class="info-card h-100">
+          <img src="{{ product.image_url }}" alt="{{ product.product_name }}" class="product-thumb mb-3">
+          <h5>{{ product.product_name }}</h5>
+          <p class="mb-2"><strong>Category:</strong> {{ product.category }}</p>
+          <p class="mb-3"><strong>Price:</strong> INR {{ product.price }}</p>
+          <a href="/store/products?category={{ product.category }}" class="btn btn-gold btn-sm w-100">View Product</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="/store/products" class="btn btn-outline-gold">Browse All Products</a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<!-- <section class="section-pad bg-cream">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">What We Offer</span>
+      <h2 class="section-title">Complete Manufacturing <span>Intelligence</span></h2>
+      <p class="section-desc">From demand prediction to delivery tracking — one integrated platform for modern garment job-work units.</p>
+      <div class="divider-gold"></div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="info-card">
+          <div class="card-icon"><i class="bi bi-cpu text-white"></i></div>
+          <h5>AI Demand Forecasting</h5>
+          <p>Random Forest ML model predicts garment demand based on month, fabric stock, historical data, and production capacity.</p>
+          <a href="/forecast" class="btn btn-sm btn-outline-secondary mt-3">Try Now →</a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="info-card">
+          <div class="card-icon navy"><i class="bi bi-clipboard-data text-white"></i></div>
+          <h5>Production Tracking</h5>
+          <p>Real-time monitoring of daily, weekly and monthly production targets with machine utilization and worker attendance.</p>
+          <a href="/production" class="btn btn-sm btn-outline-secondary mt-3">View Stats →</a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="info-card">
+          <div class="card-icon success"><i class="bi bi-file-earmark-check text-white"></i></div>
+          <h5>Order Management</h5>
+          <p>Track all brand orders from fabric receipt to final dispatch — with status updates, quantity management, and due dates.</p>
+          <a href="/orders" class="btn btn-sm btn-outline-secondary mt-3">View Orders →</a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="info-card">
+          <div class="card-icon info"><i class="bi bi-bar-chart-line text-white"></i></div>
+          <h5>Analytics Dashboard</h5>
+          <p>Visual charts of production trends, demand forecasts, order completion rates and factory performance metrics.</p>
+          <a href="/dashboard" class="btn btn-sm btn-outline-secondary mt-3">Open Dashboard →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- CALL TO ACTION -->
+<section class="section-pad" style="background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%)">
+  <div class="container text-center">
+    <span class="hero-badge">Get Started Today</span>
+    <h2 style="color:white;font-size:2.4rem;margin:16px 0">Ready to Modernize Your Garment Unit?</h2>
+    <p style="color:rgba(255,255,255,0.7);font-size:1.05rem;max-width:520px;margin:0 auto 36px">Start with AI-powered demand forecasting and scale your production with confidence.</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <!-- <a href="/forecast" class="btn btn-gold btn-lg"><i class="bi bi-lightning-charge-fill me-2"></i>Predict Demand Now</a> -->
+      <a href="/contact" class="btn btn-outline-gold btn-lg">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

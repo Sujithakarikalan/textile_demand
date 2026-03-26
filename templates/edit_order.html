@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Edit Order - GarmentPro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
+        <li class="breadcrumb-item active">Edit Order</li>
+      </ol>
+    </nav>
+    <h1>Edit Order</h1>
+    <p>Modify order details and update production status</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+  <div class="container">
+    <div class="forecast-container" style="max-width:700px;margin:auto">
+      <h4 style="color:var(--navy);margin-bottom:25px">
+        <i class="bi bi-pencil-square me-2" style="color:var(--gold)"></i>
+        Edit Order Details
+      </h4>
+
+      <form method="POST">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Product</label>
+            <input type="text" name="product_name" class="form-control" value="{{ order.product_name }}" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Size</label>
+            <select name="size" class="form-select">
+              <option value="S" {% if order.size=='S' %}selected{% endif %}>S</option>
+              <option value="M" {% if order.size=='M' %}selected{% endif %}>M</option>
+              <option value="L" {% if order.size=='L' %}selected{% endif %}>L</option>
+              <option value="XL" {% if order.size=='XL' %}selected{% endif %}>XL</option>
+              <option value="XXL" {% if order.size=='XXL' %}selected{% endif %}>XXL</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Quantity</label>
+            <input type="number" name="quantity" class="form-control" value="{{ order.quantity }}" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Required Fabric (m)</label>
+            <input type="number" class="form-control" value="{{ '%.2f'|format(order.required_fabric or 0) }}" readonly>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option {% if order.status=='In Production' %}selected{% endif %}>In Production</option>
+              <option {% if order.status=='Completed' %}selected{% endif %}>Completed</option>
+              <option {% if order.status=='Quality Check' %}selected{% endif %}>Quality Check</option>
+              <option {% if order.status=='Dispatched' %}selected{% endif %}>Dispatched</option>
+              <option {% if order.status=='Awaiting Fabric' %}selected{% endif %}>Awaiting Fabric</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Order Date</label>
+            <input type="date" name="order_date" class="form-control" value="{{ order.order_date }}">
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          <button type="submit" class="btn btn-gold"><i class="bi bi-save me-1"></i>Update Order</button>
+          <a href="/orders" class="btn btn-outline-gold">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

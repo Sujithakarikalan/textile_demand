@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block title %}Analytics Dashboard - GarmentPro{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item active">Dashboard</li></ol></nav>
+    <h1>Analytics Dashboard</h1>
+    <p>Real-time production metrics and demand analytics</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+  <div class="container">
+    <div class="row g-3 mb-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(201,168,76,0.15)"><i class="bi bi-scissors" style="color:var(--gold);font-size:1.3rem"></i></div>
+          <div><div class="stat-num" id="unitsThisMonth">0</div><div class="stat-lbl">Units This Month</div><div class="stat-change up"><i class="bi bi-arrow-up-short"></i>12.4% vs last month</div></div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(45,158,107,0.15)"><i class="bi bi-check2-all" style="color:#2d9e6b;font-size:1.3rem"></i></div>
+          <div><div class="stat-num" id="efficiencyRate">0%</div><div class="stat-lbl">Efficiency Rate</div><div class="stat-change up"><i class="bi bi-arrow-up-short"></i>3.2% improvement</div></div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(41,128,185,0.15)"><i class="bi bi-file-earmark-text" style="color:#2980b9;font-size:1.3rem"></i></div>
+          <div><div class="stat-num" id="activeOrders">0</div><div class="stat-lbl">Active Orders</div><div class="stat-change up"><i class="bi bi-arrow-up-short"></i>2 new this week</div></div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(192,57,43,0.15)"><i class="bi bi-exclamation-triangle" style="color:#c0392b;font-size:1.3rem"></i></div>
+          <div><div class="stat-num" id="delayedOrders">0</div><div class="stat-lbl">Delayed Orders</div><div class="stat-change down"><i class="bi bi-arrow-down-short"></i>1 less than last week</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-8">
+        <div class="chart-card">
+          <div class="chart-title">Monthly Production Output</div>
+          <div class="chart-sub">Units produced per month</div>
+          <canvas id="monthlyChart" height="120"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="chart-card">
+          <div class="chart-title">Order Completion Rate</div>
+          <div class="chart-sub">Status breakdown of all orders</div>
+          <canvas id="orderStatusChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="chart-card">
+          <div class="chart-title">Predicted vs Actual Demand</div>
+          <div class="chart-sub">Last 6 months comparison</div>
+          <canvas id="demandCompChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="chart-card">
+          <div class="chart-title">Production by Product Type</div>
+          <div class="chart-sub">Current month breakdown</div>
+          <canvas id="productPieChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="chart-card">
+          <div class="chart-title">Machine Utilization</div>
+          <div class="chart-sub">Active vs idle machines</div>
+          <canvas id="machineChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+const gold = '#c9a84c', navy = '#0f1e36';
+
+const monthlyChart = new Chart(document.getElementById('monthlyChart'), {
+  type: 'bar',
+  data: { labels: [], datasets: [{
+    label: 'Units Produced', data: [],
+    backgroundColor: ctx => {
+      const g = ctx.chart.ctx.createLinearGradient(0,0,0,300);
+      g.addColorStop(0, 'rgba(201,168,76,0.85)');
+      g.addColorStop(1, 'rgba(201,168,76,0.2)');
+      return g;
+    },
+    borderColor: gold, borderWidth: 2, borderRadius: 6
+  }]},
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, grid:{color:'rgba(0,0,0,0.05)'}}} }
+});
+
+const orderStatusChart = new Chart(document.getElementById('orderStatusChart'), {
+  type: 'doughnut',
+  data: { labels: [], datasets: [{ data: [], backgroundColor: ['#2d9e6b','#2980b9','#e67e22','#1abc9c','#c0392b'], borderWidth: 0 }] },
+  options: { responsive:true, cutout:'60%', plugins:{legend:{position:'bottom',labels:{font:{size:10}}}} }
+});
+
+const demandCompChart = new Chart(document.getElementById('demandCompChart'), {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [
+      { label:'Predicted', data:[], borderColor:gold, backgroundColor:'rgba(201,168,76,0.1)', tension:0.4, fill:true },
+      { label:'Actual', data:[], borderColor:navy, backgroundColor:'rgba(15,30,54,0.05)', tension:0.4, fill:true }
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{position:'top'}}, scales:{y:{beginAtZero:false}} }
+});
+
+const productPieChart = new Chart(document.getElementById('productPieChart'), {
+  type: 'pie',
+  data: { labels: [], datasets: [{ data:[], backgroundColor:[gold, navy, '#2d9e6b', '#2980b9'], borderWidth:2, borderColor:'#fff' }] },
+  options: { responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:10}}}} }
+});
+
+const machineChart = new Chart(document.getElementById('machineChart'), {
+  type: 'bar',
+  data: { labels: [], datasets: [
+    { label:'Active', data:[], backgroundColor: navy, borderRadius:6 },
+    { label:'Idle', data:[], backgroundColor:'rgba(192,57,43,0.6)', borderRadius:6 }
+  ]},
+  options: { responsive:true, plugins:{legend:{position:'top'}}, scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}} }
+});
+
+async function loadSummary() {
+  const resp = await fetch('/api/dashboard/summary');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  document.getElementById('unitsThisMonth').textContent = Number(data.units_this_month).toLocaleString();
+  document.getElementById('efficiencyRate').textContent = data.efficiency_rate + '%';
+  document.getElementById('activeOrders').textContent = data.active_orders;
+  document.getElementById('delayedOrders').textContent = data.delayed_orders;
+}
+
+async function loadMonthlyProduction() {
+  const resp = await fetch('/api/dashboard/monthly-production');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  monthlyChart.data.labels = data.labels;
+  monthlyChart.data.datasets[0].data = data.units;
+  monthlyChart.update();
+}
+
+async function loadOrderStatus() {
+  const resp = await fetch('/api/dashboard/order-status');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  orderStatusChart.data.labels = data.labels;
+  orderStatusChart.data.datasets[0].data = data.counts;
+  orderStatusChart.update();
+}
+
+async function loadDemandComparison() {
+  const resp = await fetch('/api/dashboard/demand-comparison');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  demandCompChart.data.labels = data.labels;
+  demandCompChart.data.datasets[0].data = data.predicted;
+  demandCompChart.data.datasets[1].data = data.actual;
+  demandCompChart.update();
+}
+
+async function loadProductTypeProduction() {
+  const resp = await fetch('/api/dashboard/product-type');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  productPieChart.data.labels = data.labels;
+  productPieChart.data.datasets[0].data = data.units;
+  productPieChart.update();
+}
+
+async function loadMachineUtilization() {
+  const resp = await fetch('/api/dashboard/machine-utilization');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  machineChart.data.labels = data.labels;
+  machineChart.data.datasets[0].data = data.active;
+  machineChart.data.datasets[1].data = data.idle;
+  machineChart.update();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await Promise.all([
+    loadSummary(),
+    loadMonthlyProduction(),
+    loadOrderStatus(),
+    loadDemandComparison(),
+    loadProductTypeProduction(),
+    loadMachineUtilization()
+  ]);
+});
+</script>
+
+
+{% endblock %}

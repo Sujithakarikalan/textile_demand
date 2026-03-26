@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Manager Dashboard – GarmentPro{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item active">Manager Dashboard</li>
+      </ol>
+    </nav>
+    <h1>Production Manager</h1>
+    <p>Monitor factory production and manage order progress</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+  <div class="container">
+
+    <div class="row g-4">
+
+      <!-- Production Management Card -->
+
+      <div class="col-lg-4 col-md-6">
+        <div class="info-card text-center">
+
+          <div class="card-icon navy">
+            <i class="bi bi-gear-wide-connected"></i>
+          </div>
+
+          <h5>Production Management</h5>
+
+          <p>
+            Track factory production status, monitor machines,
+            and update order production stages.
+          </p>
+
+          <a href="/production" class="btn btn-gold mt-2">
+            Open Production
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Orders Monitoring Card -->
+<!-- 
+      <div class="col-lg-4 col-md-6">
+        <div class="info-card text-center">
+
+          <div class="card-icon success">
+            <i class="bi bi-list-check"></i>
+          </div>
+
+          <h5>Orders Monitoring</h5>
+
+          <p>
+            View all incoming orders and check the progress of
+            garments currently in production.
+          </p>
+
+          <a href="/orders" class="btn btn-outline-gold mt-2">
+            View Orders
+          </a>
+
+        </div>
+      </div> -->
+
+      <!-- Factory Statistics -->
+
+      <!-- <div class="col-lg-4 col-md-6">
+        <div class="info-card text-center">
+
+          <div class="card-icon info">
+            <i class="bi bi-bar-chart-line"></i>
+          </div>
+
+          <h5>Production Statistics</h5>
+
+          <p>
+            Analyze production output, worker efficiency,
+            and machine utilization statistics.
+          </p>
+
+          <a href="/dashboard" class="btn btn-outline-gold mt-2">
+            View Analytics
+          </a>
+
+        </div> -->
+
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-4 col-md-6">
+        <div class="info-card text-center">
+          <div class="card-icon warning">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <h5>Fabric Inventory</h5>
+          <p>Maintain available fabric stock for production feasibility checks.</p>
+          <a href="/fabric-inventory" class="btn btn-outline-gold mt-2">Open Inventory</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

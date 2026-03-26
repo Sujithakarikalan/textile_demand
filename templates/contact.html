@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Contact – GarmentPro{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item active">Contact</li></ol></nav>
+    <h1>Get In Touch</h1>
+    <p>Reach out for demos, queries, or implementation support</p>
+  </div>
+</div>
+<section class="section-pad bg-cream">
+  <div class="container">
+    <div class="row g-5 justify-content-center">
+      <div class="col-lg-5">
+        <span class="section-eyebrow">Contact Us</span>
+        <h2 class="section-title" style="text-align:left">Let's Talk <span>Manufacturing</span></h2>
+        <p style="color:var(--text-mid);line-height:1.8;margin-bottom:36px">Interested in implementing GarmentPro for your manufacturing unit? Contact us for a personalized demo or reach out with any questions.</p>
+        <div class="contact-info-item"><div class="contact-icon"><i class="bi bi-geo-alt" style="color:var(--gold)"></i></div><div><h6>Address</h6><p>6/196, Goundan Thottam,
+Thenmugam Kangeyampalayam,
+Kasthuripalayam (PO),
+Uthukkuli (TK),</p></div></div>
+        <div class="contact-info-item"><div class="contact-icon"><i class="bi bi-telephone" style="color:var(--gold)"></i></div><div><h6>Phone</h6><p>+91 99444 08060</p></div></div>
+        <div class="contact-info-item"><div class="contact-icon"><i class="bi bi-envelope" style="color:var(--gold)"></i></div><div><h6>Email</h6><p>info@garmentpro.in</p></div></div>
+        <div class="contact-info-item"><div class="contact-icon"><i class="bi bi-clock" style="color:var(--gold)"></i></div><div><h6>Working Hours</h6><p>Monday–Saturday, 9:00 AM – 6:00 PM IST</p></div></div>
+      </div>
+      <div class="col-lg-6">
+        <div class="contact-form-wrap">
+          <h5 style="color:var(--navy);margin-bottom:24px"><i class="bi bi-send me-2" style="color:var(--gold)"></i>Send Us a Message</h5>
+          <div id="formAlert" style="display:none" class="alert alert-success">✅ Thank you! Your message has been received. We'll get back to you within 24 hours.</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="cname" placeholder="e.g. Rajesh Kumar">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="cemail" placeholder="you@example.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="cphone" placeholder="+91 98765 43210">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Unit Type</label>
+              <select class="form-select" id="ctype">
+                <option>Shirts Manufacturing</option><option>Innerwear Unit</option>
+                <option>Kidswear Unit</option><option>Multi-product Unit</option><option>Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Subject</label>
+              <input type="text" class="form-control" id="csubject" placeholder="e.g. Request for Demo">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Message</label>
+              <textarea class="form-control" id="cmessage" rows="5" placeholder="Tell us about your manufacturing unit and what you're looking for..."></textarea>
+            </div>
+            <div class="col-12">
+              <button class="predict-btn" onclick="submitForm()"><i class="bi bi-send me-2"></i>Send Message</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+function submitForm() {
+  const name = document.getElementById('cname').value;
+  const email = document.getElementById('cemail').value;
+  const message = document.getElementById('cmessage').value;
+  if (!name || !email || !message) { alert('Please fill in Name, Email and Message fields.'); return; }
+  document.getElementById('formAlert').style.display = 'block';
+  document.getElementById('cname').value = '';
+  document.getElementById('cemail').value = '';
+  document.getElementById('cmessage').value = '';
+  document.getElementById('cphone').value = '';
+  document.getElementById('csubject').value = '';
+  window.scrollTo(0, 400);
+}
+</script>
+{% endblock %}

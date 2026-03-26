@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Products Store - GarmentPro{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item active">Products Store</li></ol></nav>
+    <h1>Products &amp; Services</h1>
+    <p>Comprehensive garment product showcase</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream" style="padding-bottom:30px;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-tag">Premium Range</span>
+      <h2 class="section-heading mt-2">Our Textile Products</h2>
+      <div class="section-rule"></div>
+      <p class="text-muted">High-quality garments for modern fashion requirements</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm product-card text-center">
+          <div class="card-body p-4">
+            <div class="card-icon-pill mx-auto"><i class="bi bi-tshirt" style="font-size:1.3rem"></i></div>
+            <h4 class="card-title mt-3">Shirts</h4>
+            <p class="card-text">Premium quality shirts with clean stitching and rich fabric finish.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm product-card text-center">
+          <div class="card-body p-4">
+            <div class="card-icon-pill mx-auto"><i class="bi bi-person-bounding-box" style="font-size:1.3rem"></i></div>
+            <h4 class="card-title mt-3">Innerwear</h4>
+            <p class="card-text">Soft breathable innerwear built for daily comfort and durability.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="card h-100 shadow-sm product-card text-center">
+          <div class="card-body p-4">
+            <div class="card-icon-pill mx-auto"><i class="bi bi-bag" style="font-size:1.3rem"></i></div>
+            <h4 class="card-title mt-3">Trousers & Kidswear</h4>
+            <p class="card-text">Stylish trousers and kids garments with quality-first production.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pb-5" style="background:var(--cream);">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="section-tag">Our Collection</span>
+      <h2 class="section-heading mt-2">Explore Our Products</h2>
+      <div class="section-rule"></div>
+      <p class="text-muted">Real garment product photos with category-wise layout</p>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-4 justify-content-center" id="categoryTabs">
+      <button class="btn btn-gold btn-sm" data-category="">All</button>
+      {% for category in categories %}
+      <button class="btn btn-outline-gold btn-sm" data-category="{{ category }}">{{ category }}</button>
+      {% endfor %}
+      {% if session.get('role') == 'admin' %}
+      <a href="/store/admin/products/new" class="btn btn-outline-gold btn-sm">Add Product</a>
+      {% endif %}
+    </div>
+
+    <div id="galleryRoot"></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const categoryTabs = document.getElementById('categoryTabs');
+const galleryRoot = document.getElementById('galleryRoot');
+
+function renderCard(p) {
+  return `
+    <div class="col-md-3 col-sm-6">
+      <div class="product-gallery-card">
+        <img src="${p.image_url}" class="img-fluid" alt="${p.product_name}">
+        <h6>${p.product_name}</h6>
+        <p class="mb-1">${p.category}</p>
+        <a href="/store/products/${p.id}" class="btn btn-gold btn-sm w-100">View Product</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderCategoryBlock(name, items) {
+  return `
+    <h3 class="category-title">${name}</h3>
+    <div class="row g-4 mb-5">
+      ${items.map(renderCard).join('')}
+    </div>
+  `;
+}
+
+async function loadProducts(category = '') {
+  const query = category ? `?category=${encodeURIComponent(category)}` : '';
+  const resp = await fetch(`/api/store/products${query}`);
+  const data = await resp.json();
+  if (!data.success) return;
+
+  if (category) {
+    galleryRoot.innerHTML = renderCategoryBlock(category, data.products);
+    return;
+  }
+
+  const groups = {};
+  data.products.forEach(p => {
+    if (!groups[p.category]) groups[p.category] = [];
+    groups[p.category].push(p);
+  });
+
+  const ordered = ['Shirts', 'Innerwear', 'Kidswear', 'Trousers'];
+  galleryRoot.innerHTML = ordered
+    .filter(c => groups[c] && groups[c].length)
+    .map(c => renderCategoryBlock(c, groups[c]))
+    .join('');
+}
+
+categoryTabs.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-category]');
+  if (!btn) return;
+  [...categoryTabs.querySelectorAll('button')].forEach(b => {
+    b.classList.remove('btn-gold');
+    b.classList.add('btn-outline-gold');
+  });
+  btn.classList.remove('btn-outline-gold');
+  btn.classList.add('btn-gold');
+  loadProducts(btn.dataset.category || '');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get('category') || '';
+  const tab = categoryTabs.querySelector(`button[data-category="${category}"]`) || categoryTabs.querySelector('button[data-category=""]');
+  if (tab) {
+    [...categoryTabs.querySelectorAll('button')].forEach(b => {
+      b.classList.remove('btn-gold');
+      b.classList.add('btn-outline-gold');
+    });
+    tab.classList.remove('btn-outline-gold');
+    tab.classList.add('btn-gold');
+  }
+  loadProducts(category);
+});
+</script>
+{% endblock %}

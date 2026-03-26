@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Register – GarmentPro{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1>Create Account</h1>
+    <p>Register to access the GarmentPro platform</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+
+<div class="container">
+
+<div class="row justify-content-center">
+
+<div class="col-lg-6">
+
+<div class="forecast-container">
+
+<h4 style="color:var(--navy);margin-bottom:20px">
+<i class="bi bi-person-plus me-2"></i>User Registration
+</h4>
+
+<form method="POST">
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<label class="form-label">Username</label>
+<input type="text" name="username" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+<label class="form-label">Email</label>
+<input type="email" name="email" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+<label class="form-label">Password</label>
+<input type="password" name="password" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+<label class="form-label">Role</label>
+
+<select name="role" class="form-select" required>
+<option value="">Select Role</option>
+<option value="company">Company</option>
+<option value="manager">Manager</option>
+</select>
+
+</div>
+
+<div class="col-12">
+<button class="btn btn-gold w-100">Register</button>
+</div>
+
+</div>
+
+</form>
+
+<p style="font-size:0.9rem;color:var(--text-mid);margin-top:15px">
+Already registered?
+<a href="/login" style="color:var(--gold)">Login here</a>
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+{% endblock %}

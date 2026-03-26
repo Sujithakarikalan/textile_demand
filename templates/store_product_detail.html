@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.product_name }} - Product Details{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item"><a href="/store/products">Products</a></li><li class="breadcrumb-item active">{{ product.product_name }}</li></ol></nav>
+    <h1>{{ product.product_name }}</h1>
+    <p>{{ product.category }} collection</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+  <div class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-success mb-4">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-6">
+        <div class="chart-card">
+          <img id="mainProductImage" src="{{ product.image_url }}" alt="{{ product.product_name }}" class="product-thumb" style="height:420px;">
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="forecast-container">
+          <h3 style="color:var(--navy)">{{ product.product_name }}</h3>
+          <p class="mb-2"><strong>Category:</strong> {{ product.category }}</p>
+          <h6 style="color:var(--navy)">Product Description</h6>
+          <p style="color:var(--text-mid)">{{ product.description }}</p>
+          <ul class="feature-list mt-2" style="list-style:none;padding-left:0">
+            <li>Premium fabric with durable stitching and long-lasting fit.</li>
+            <li>Comfort-focused tailoring for daily wear and easy movement.</li>
+            <li>Suitable for casual styling with modern wardrobe essentials.</li>
+          </ul>
+          {% if session.get('role') == 'admin' %}
+            <div class="mt-4">
+              <a href="/store/admin/products/new" class="btn btn-gold w-100">Add Product</a>
+            </div>
+            <p class="small text-muted mt-3">Admin can manage product catalog from this page.</p>
+          {% else %}
+            <form method="POST" action="/store/orders/place" class="mt-4">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+
+              <div class="mb-3">
+                <label class="form-label">Color Options</label>
+                <select name="color" class="form-select">
+                  <option>Black</option>
+                  <option>Navy</option>
+                  <option>Grey</option>
+                  <option>White</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Size</label>
+                <select name="size" class="form-select" required>
+                  <option value="S">S</option>
+                  <option value="M" selected>M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="quantity" class="form-control" min="1" value="1" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Order Date</label>
+                <input type="date" name="order_date" class="form-control" required>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-gold w-100">Place Order / Buy Now</button>
+                <button type="submit" formaction="/store/cart/add" formnovalidate class="btn btn-outline-gold w-100">Add to Cart</button>
+              </div>
+            </form>
+
+            {% if not session.get('user') %}
+            <p class="small text-muted mt-3">You will be redirected to login before order placement.</p>
+            {% elif session.get('role') != 'company' %}
+            <p class="small text-muted mt-3">Only company users can place orders.</p>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

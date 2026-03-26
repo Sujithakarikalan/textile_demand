@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Demand Forecasting - GarmentPro{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item active">Forecast</li></ol></nav>
+    <h1>Production Feasibility Forecast</h1>
+    <p>Check if this month orders can be completed based on required vs available fabric.</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream" >
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      <div class="col-lg-5">
+        <div class="forecast-container">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="card-icon"><i class="bi bi-cpu text-white"></i></div>
+            <div>
+              <h4 style="color:var(--navy);margin:0">Forecast Production Feasibility</h4>
+              <p style="color:var(--text-light);font-size:0.85rem;margin:0">Uses quantity, required fabric, and current available fabric inventory.</p>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Product Type</label>
+              <select class="form-select" id="product_type" required>
+                <option value="" disabled selected>Select Product Type</option>
+                <option value="shirt">Shirt</option>
+                <option value="trouser">Trouser</option>
+                <option value="kids wear">Kids wear</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Quantity</label>
+              <input type="number" class="form-control" id="quantity" min="1" value="1" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Required Fabric (meters)</label>
+              <input type="number" class="form-control" id="required_fabric" readonly>
+            </div>
+            <div class="col-12 mt-2">
+              <button class="predict-btn" id="predictBtn" onclick="predictDemand()">
+                <i class="bi bi-lightning-charge-fill me-2"></i>Check Feasibility
+              </button>
+            </div>
+          </div>
+
+          <div class="result-box" id="resultBox">
+            <div class="result-number" id="resultNum">-</div>
+            <div class="result-label">Predicted Demand for Next Month (Garments)</div>
+            <div style="margin-top:10px;color:rgba(255,255,255,0.85);font-size:0.9rem">
+              Available Fabric: <strong id="availableFabric">0.00</strong> m
+            </div>
+            <div style="margin-top:8px;color:var(--gold-light);font-weight:600" id="feasibilityText">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="chart-card mb-4">
+          <div class="chart-title">Quantity vs Predicted Demand</div>
+          <div class="chart-sub">Single-product comparison for selected order input</div>
+          <canvas id="forecastChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const chartDefaults = { font: { family: "'DM Sans', sans-serif" } };
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+const forecastChart = new Chart(document.getElementById('forecastChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Selected Product'],
+    datasets: [
+      { label: 'Order Quantity', data: [0], backgroundColor: 'rgba(201,168,76,0.4)', borderColor: '#c9a84c', borderWidth: 2, borderRadius: 6 },
+      { label: 'Predicted Demand', data: [0], backgroundColor: 'rgba(15,30,54,0.7)', borderColor: '#0f1e36', borderWidth: 2, borderRadius: 6 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+});
+
+const fabricPerProduct = {
+  'shirt': 2,
+  'trouser': 1.5,
+  'kids wear': 5
+};
+
+function refreshRequiredFabric() {
+  const productTypeValue = document.getElementById('product_type').value;
+  const quantityValue = parseFloat(document.getElementById('quantity').value || '0');
+  const rate = fabricPerProduct[productTypeValue] || 2;
+  const required = quantityValue * rate;
+  document.getElementById('required_fabric').value = required ? required.toFixed(2) : '';
+}
+
+async function predictDemand() {
+  const productTypeValue = document.getElementById('product_type').value;
+  const quantityValue = document.getElementById('quantity').value;
+  const requiredFabricValue = document.getElementById('required_fabric').value;
+
+  if (!productTypeValue || !quantityValue) {
+    alert('Please select product type and quantity.');
+    return;
+  }
+
+  if (!requiredFabricValue) {
+    alert('Required fabric is not available.');
+    return;
+  }
+
+  const btn = document.getElementById('predictBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spin"></span>Predicting...';
+
+  const payload = {
+    product_type: productTypeValue,
+    quantity: parseFloat(quantityValue),
+    required_fabric: parseFloat(requiredFabricValue)
+  };
+
+  try {
+    const resp = await fetch('/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+
+    if (data.success) {
+      document.getElementById('resultNum').textContent = data.predicted_demand.toLocaleString();
+      document.getElementById('availableFabric').textContent = Number(data.available_fabric || 0).toFixed(2);
+      document.getElementById('feasibilityText').textContent = data.feasibility;
+      document.getElementById('resultBox').classList.add('show');
+
+      forecastChart.data.labels = [data.product_type];
+      forecastChart.data.datasets[0].data = [payload.quantity];
+      forecastChart.data.datasets[1].data = [data.predicted_demand];
+      forecastChart.update();
+    }
+  } catch(e) {
+    alert('Prediction failed: ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>Check Feasibility';
+}
+
+document.getElementById('product_type').addEventListener('change', refreshRequiredFabric);
+document.getElementById('quantity').addEventListener('input', refreshRequiredFabric);
+</script>
+{% endblock %}

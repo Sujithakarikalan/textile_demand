@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Production Tracking - GarmentPro{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item active">Production</li></ol></nav>
+    <h1>Production Tracking</h1>
+    <p>Real-time factory floor performance and production statistics</p>
+  </div>
+</div>
+
+<section class="section-pad bg-cream">
+  <div class="container">
+    <div class="row g-3 mb-4">
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:rgba(201,168,76,0.15)"><i class="bi bi-bullseye" style="color:var(--gold)"></i></div><div><div class="stat-num" id="dailyTarget">0</div><div class="stat-lbl">Daily Target</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:rgba(45,158,107,0.15)"><i class="bi bi-check2-all" style="color:#2d9e6b"></i></div><div><div class="stat-num" id="completedToday">0</div><div class="stat-lbl">Completed Today</div><div class="stat-change up" id="todayPercent">0.0% of target</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:rgba(41,128,185,0.15)"><i class="bi bi-gear" style="color:#2980b9"></i></div><div><div class="stat-num" id="machinesActive">0/0</div><div class="stat-lbl">Machines Active</div></div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-icon" style="background:rgba(230,126,34,0.15)"><i class="bi bi-people" style="color:var(--warning)"></i></div><div><div class="stat-num" id="workersPresent">0/0</div><div class="stat-lbl">Workers Present</div></div></div></div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="progress-card">
+          <h5 style="color:var(--navy);margin-bottom:20px"><i class="bi bi-bar-chart-steps me-2" style="color:var(--gold)"></i>Production Progress</h5>
+          <div class="mb-4">
+            <div class="progress-label"><span>Today's Production</span><strong id="todayProgressText">0 / 0 units</strong></div>
+            <div class="progress"><div class="progress-bar progress-bar-gold" id="todayProgressBar" style="width:0%"></div></div>
+            <div style="font-size:0.78rem;color:var(--text-light);margin-top:4px" id="todayProgressPercent">0.0% achieved</div>
+          </div>
+          <div class="mb-4">
+            <div class="progress-label"><span>Weekly Production</span><strong id="weekProgressText">0 / 0 units</strong></div>
+            <div class="progress"><div class="progress-bar progress-bar-navy" id="weekProgressBar" style="width:0%"></div></div>
+            <div style="font-size:0.78rem;color:var(--text-light);margin-top:4px" id="weekProgressPercent">0.0% achieved</div>
+          </div>
+          <div class="mb-4">
+            <div class="progress-label"><span>Monthly Production</span><strong id="monthProgressText">0 / 0 units</strong></div>
+            <div class="progress"><div class="progress-bar progress-bar-success" id="monthProgressBar" style="width:0%"></div></div>
+            <div style="font-size:0.78rem;color:var(--text-light);margin-top:4px" id="monthProgressPercent">0.0% achieved</div>
+          </div>
+          <div class="mb-2">
+            <div class="progress-label"><span>Machine Utilization</span><strong id="machineUtilText">0 / 0 machines</strong></div>
+            <div class="progress"><div class="progress-bar" id="machineUtilBar" style="background:linear-gradient(90deg,#2980b9,#3498db);border-radius:8px;width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="chart-card">
+          <div class="chart-title">Hourly Production Output</div>
+          <div class="chart-sub">Today's production by shift hour</div>
+          <canvas id="hourlyChart" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-12">
+        <div class="chart-card">
+          <div class="chart-title">Monthly Production Trend</div>
+          <div class="chart-sub" id="monthlyChartSub">Full year production output</div>
+          <canvas id="prodTrendChart" height="90"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+const hourlyChart = new Chart(document.getElementById('hourlyChart'), {
+  type: 'bar',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Units Completed',
+      data: [],
+      backgroundColor: 'rgba(201,168,76,0.7)', borderColor: '#c9a84c', borderWidth:2, borderRadius:6
+    }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+});
+
+const prodTrendChart = new Chart(document.getElementById('prodTrendChart'), {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [{
+      label: 'Monthly Production',
+      data: [],
+      borderColor: '#0f1e36', backgroundColor: 'rgba(15,30,54,0.07)',
+      tension: 0.4, fill: true, pointRadius:5, pointBackgroundColor:'#c9a84c', pointBorderColor:'#0f1e36'
+    }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:false}} }
+});
+
+function safePercent(done, target) {
+  if (!target || target <= 0) return 0;
+  return (done / target) * 100;
+}
+
+function applyProgress(barId, labelId, percent) {
+  const p = Math.max(0, Math.min(100, percent));
+  document.getElementById(barId).style.width = p.toFixed(0) + '%';
+  document.getElementById(labelId).textContent = p.toFixed(1) + '% achieved';
+}
+
+async function loadProductionSummary() {
+  const resp = await fetch('/api/production/summary');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  const todayPct = safePercent(data.completed_today, data.daily_target);
+  const weekPct = safePercent(data.completed_week, data.weekly_target);
+  const monthPct = safePercent(data.completed_month, data.monthly_target);
+  const machinePct = safePercent(data.machines_active, data.total_machines);
+
+  document.getElementById('dailyTarget').textContent = data.daily_target;
+  document.getElementById('completedToday').textContent = data.completed_today;
+  document.getElementById('todayPercent').textContent = todayPct.toFixed(1) + '% of target';
+  document.getElementById('machinesActive').textContent = data.machines_active + '/' + data.total_machines;
+  document.getElementById('workersPresent').textContent = data.workers_present + '/' + data.total_workers;
+
+  document.getElementById('todayProgressText').textContent = data.completed_today + ' / ' + data.daily_target + ' units';
+  document.getElementById('weekProgressText').textContent = data.completed_week + ' / ' + data.weekly_target + ' units';
+  document.getElementById('monthProgressText').textContent = data.completed_month + ' / ' + data.monthly_target + ' units';
+  document.getElementById('machineUtilText').textContent = data.machines_active + ' / ' + data.total_machines + ' machines';
+
+  applyProgress('todayProgressBar', 'todayProgressPercent', todayPct);
+  applyProgress('weekProgressBar', 'weekProgressPercent', weekPct);
+  applyProgress('monthProgressBar', 'monthProgressPercent', monthPct);
+  document.getElementById('machineUtilBar').style.width = Math.max(0, Math.min(100, machinePct)).toFixed(0) + '%';
+}
+
+async function loadHourlyChart() {
+  const resp = await fetch('/api/production/hourly');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  hourlyChart.data.labels = data.labels;
+  hourlyChart.data.datasets[0].data = data.units;
+  hourlyChart.update();
+}
+
+async function loadMonthlyChart() {
+  const resp = await fetch('/api/production/monthly');
+  const data = await resp.json();
+  if (!data.success) return;
+
+  document.getElementById('monthlyChartSub').textContent = 'Full year production output - ' + data.year;
+  prodTrendChart.data.labels = data.labels;
+  prodTrendChart.data.datasets[0].data = data.units;
+  prodTrendChart.update();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await Promise.all([loadProductionSummary(), loadHourlyChart(), loadMonthlyChart()]);
+});
+</script>
+{% endblock %}
